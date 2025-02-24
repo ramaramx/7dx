@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const scene = document.querySelector("a-scene");
-  scene.setAttribute("xrweb", "disableWorldTracking: false"); // Enable SLAM
+  scene.setAttribute("xrweb", "disableWorldTracking: true"); // Enable SLAM
 
   // Play button handler
   playButton.addEventListener("click", () => {
@@ -520,16 +520,12 @@ AFRAME.registerComponent("panic-mode", {
 
     // Track found/lost targets
     this.el.sceneEl.addEventListener("xrimagefound", ({ detail }) => {
-      console.log("Panic mode: image found:", detail.name);
       if (!found.includes(detail.name)) {
         found.push(detail.name);
-        console.log("Panic mode: added to found list:", detail.name);
-        console.log("Current found list:", found);
       }
     });
 
     this.el.sceneEl.addEventListener("xrimagelost", ({ detail }) => {
-      console.log("Panic mode: image lost:", detail.name);
 
       // Don't handle target lost during video playback
       if (activeVideo && !activeVideo.paused) {
@@ -540,9 +536,6 @@ AFRAME.registerComponent("panic-mode", {
       const index = found.indexOf(detail.name);
       if (index !== -1) {
         found.splice(index, 1);
-        console.log("Panic mode: removed from found list:", detail.name);
-        console.log("Current found list:", found);
-
         // Hide play button when target is lost
         hidePlayButton();
       }
@@ -572,7 +565,7 @@ AFRAME.registerComponent("target-handler", {
     star.setAttribute("visible", "false");
 
     // Add SLAM tracking to the star
-    star.setAttribute("slam-tracking", { targetName: this.targetName });
+    // star.setAttribute("slam-tracking", { targetName: this.targetName });
 
     // Create hider object and parent it to the star
     const hider = document.createElement("a-entity");
@@ -1134,7 +1127,7 @@ AFRAME.registerComponent("splash-image", {
     // Handle camera button click - Start AR
     cameraButton.onclick = () => {
       // Initialize AR with world tracking disabled
-      this.el.sceneEl.setAttribute("xrweb", "disableWorldTracking: false");
+      this.el.sceneEl.setAttribute("xrweb", "disableWorldTracking: true");
 
       // Hide splash screen
       splashimage.classList.add("hidden");
