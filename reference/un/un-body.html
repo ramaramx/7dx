@@ -1,0 +1,57 @@
+<!-- Copyright (c) 2022 8th Wall, Inc. -->
+<!-- body.html is optional; elements will be added to your html body after app.js is loaded. -->
+<a-scene
+  landing-page
+  xrextras-loading
+  xrextras-runtime-error
+  panic-mode
+  config-targets="targets: macaw, owl, peacock, pelican, pigeon, puffin, cardinal, toucan, blue-jay, rooster"
+  xrweb="disableWorldTracking: true">
+  <a-camera
+    position="0 4 10"
+    raycaster="objects: .cantap"
+    cursor="fuse: false; rayOrigin: mouse;"></a-camera>
+
+  <a-entity xrextras-named-image-target="name: macaw">
+    <a-text value="macaw" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: owl">
+    <a-text value="owl" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: peacock">
+    <a-text value="peacock" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: pelican">
+    <a-text value="pelican" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: pigeon">
+    <a-text value="pigeon" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: puffin">
+    <a-text value="puffin" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: cardinal">
+    <a-text value="cardinal" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: toucan">
+    <a-text value="toucan" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: blue-jay">
+    <a-text value="blue jay" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: rooster">
+    <a-text value="rooster" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: penguin">
+    <a-text value="penguin" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: ostrich">
+    <a-text value="ostrich" align="center"></a-text>
+  </a-entity>
+  <a-entity xrextras-named-image-target="name: roadrunner">
+    <a-text value="roadrunner" align="center"></a-text>
+  </a-entity>
+
+  <a-light type="directional" intensity="0.5" position="1 1 1"></a-light>
+  <a-light type="ambient" intensity="1"></a-light>
+</a-scene>

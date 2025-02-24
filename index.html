@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Moving Beach Experience</title>
+  <link rel="stylesheet" href="index.css">
+
+  <script src="//cdn.8thwall.com/web/aframe/8frame-1.4.1.min.js"></script>
+  <script src="//cdn.8thwall.com/web/xrextras/xrextras.js"></script>
+  <!-- <script src="//cdn.8thwall.com/web/landing-page/landing-page.js"></script> -->
+  <script async src="//apps.8thwall.com/xrweb?appKey=z96tlyVebhpTmkeMMncrI8cVoJkYGweiF8D9T9XlaHDAAnYW2MVy3WQsd5Zp83RhotpVJB"></script>
+  <script src="app.js"></script>
+  <!-- <script src="reflections.js"></script> -->
+  <script src="model-spawn.js"></script>
+   <script src="slam-tracking.js"></script>
+</head> 
+<body>
+  <button id="play-button" class="play-button">Tap to play</button>
+  <button id="collect-button" class="play-button">Tap to collect</button>
+  <div id="icon-bar" class="icon-bar">
+    <img src="assets/icons/icon-01.png" alt="Icon 1" class="icon">
+    <img src="assets/icons/icon-02.png" alt="Icon 2" class="icon">
+    <img src="assets/icons/icon-03.png" alt="Icon 3" class="icon">
+    <img src="assets/icons/icon-04.png" alt="Icon 4" class="icon">
+    <img src="assets/icons/icon-05.png" alt="Icon 5" class="icon">
+    <img src="assets/icons/icon-06.png" alt="Icon 6" class="icon">
+  </div>
+
+<div id="splashimage">
+  <div class="splash-content">
+    <!-- Header Section -->
+    <div class="splash-header">
+      <h1 class="splash-title">Visit the real star of the show</h1>
+      <img src="assets/images/title-gb.svg" alt="GREAT BRITAIN" class="splash-heading">
+    </div>
+    
+    <!-- Main Content Section -->
+    <div class="splash-main">
+      <!-- Instructions Screen -->
+      <div class="instructions" id="instructions-screen">
+        <h2>INSTRUCTIONS</h2>
+        <ol>
+          <li>Fill in your name below:</li>
+        </ol>
+        <input type="text" id="nameInput" placeholder="Enter your name" enterkeyhint="done" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" />
+        
+        <ol start="2">
+          <li>Walk around Mov'in Bed and find the 6 Great Britain markers.</li>
+          <li>Scan the markers to watch and collect your scenes starring Great Britain as the star of the show.</li>
+          <li>Collect all 6 scenes and you will receive a Great Britain movie trailer and a sweet surprise. Show this at the main bar to redeem your prize.</li>
+        </ol>
+      </div>
+
+      <!-- Camera Button Screen -->
+      <div class="camera-screen hidden" id="camera-screen">
+        <p class="camera-text">Click the button below to switch to camera mode and start your journey.</p>
+        <button class="camera-button" id="camera-button">
+          <img src="assets/images/icon-camera.svg" alt="Camera" class="camera-icon">
+        </button>
+      </div>
+    </div>
+    
+    <button id="start" class="next-button" disabled>NEXT</button>
+    <!-- Footer Section -->
+    <div class="splash-footer">
+      <img src="assets/images/logo-gb-red.svg" alt="Visit Britain Logo" class="footer-logo" />
+    </div>
+  </div>
+</div>
+
+<a-scene
+  splash-image
+  xrextras-gesture-detector
+  -landing-page
+  -xrextras-loading
+  panic-mode
+  config-targets="targets: vb-target-01, vb-target-02, vb-target-03, vb-target-04, vb-target-05, vb-target-06"
+  xrweb
+  xrconfig
+  xrextras-runtime-error
+  xrextras-tap-recenter
+  renderer="colorManagement: true">
+
+  <!-- We can define assets here to be loaded when A-Frame initializes -->
+  <a-assets>
+    <!-- Credit to Poly by Google for the model: https://poly.google.com/view/5ZMAz7_ucTn -->
+    <a-asset-item id="starModel" src="assets/3d/star_hider.glb"></a-asset-item>
+    <a-asset-item id="hiderModel" src="assets/3d/hider.glb"></a-asset-item>
+    <img id="starTexture1" src="" crossorigin="anonymous">
+    <img id="starTexture2" src="assets/3d/tex/bg-02.jpg" crossorigin="anonymous">
+    <img id="starTexture3" src="assets/3d/tex/bg-03.jpg" crossorigin="anonymous">
+    <img id="starTexture4" src="assets/3d/tex/bg-04.jpg" crossorigin="anonymous">
+    <img id="starTexture5" src="assets/3d/tex/bg-05.jpg" crossorigin="anonymous">
+    <img id="starTexture6" src="assets/3d/tex/bg-06.jpg" crossorigin="anonymous">
+    <video id="video1" src="assets/movies/vid-01.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <video id="video2" src="assets/movies/vid-02.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <video id="video3" src="assets/movies/vid-03.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <video id="video4" src="assets/movies/vid-04.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <video id="video5" src="assets/movies/vid-05.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <video id="video6" src="assets/movies/vid-06.mp4" preload="auto" crossorigin="anonymous" playsinline="" webkit-playsinline=""></video>
+    <audio id="success-sound" preload="auto" class="a-sound" src="./assets/Success5.wav" response-type="arraybuffer"></audio>
+    <audio id="swoosh-sound" preload="auto" class="a-sound" src="./assets/swoosh.wav" response-type="arraybuffer"></audio>
+    <audio id="swoosh2-sound" preload="auto" class="a-sound" src="./assets/swoosh2.wav" response-type="arraybuffer"></audio>
+    
+    <!-- 3D Models -->
+    <a-asset-item id="item-01" src="assets/3d/item-01.glb"></a-asset-item>
+    <a-asset-item id="item-02" src="assets/3d/item-02.glb"></a-asset-item>
+    <a-asset-item id="item-03" src="assets/3d/item-03.glb"></a-asset-item>
+    <a-asset-item id="item-04" src="assets/3d/item-04.glb"></a-asset-item>
+    <a-asset-item id="item-05" src="assets/3d/item-05.glb"></a-asset-item>
+    <a-asset-item id="item-06" src="assets/3d/item-06.glb"></a-asset-item>
+  </a-assets>
+
+  <!-- Camera -->
+  <a-camera
+    id="camera"
+    position="0 8 8"
+    raycaster="objects: .cantap"
+    cursor="fuse: false; rayOrigin: mouse;"
+    wasd-controls="enabled: false">
+  </a-camera>
+  
+  <!-- Sound effects -->
+  <a-entity id="success-sound-player" sound="src: #success-sound; loop: false; volume: 1; positional: false; autoplay: false;"></a-entity>
+
+  <!-- Target 1 -->
+
+  <a-entity xrextras-named-image-target="name: vb-target-01" class="image-target"  target-handler slam-tracking model-spawn>
+    <a-plane color="red" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 1" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  
+
+  <!-- Target 2 -->
+  <a-entity xrextras-named-image-target="name: vb-target-02" class="image-target" target-handler slam-tracking  model-spawn>
+    <a-plane color="blue" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 2" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <!-- Target 3 -->
+  <a-entity xrextras-named-image-target="name: vb-target-03" class="image-target" target-handler slam-tracking model-spawn>
+    <a-plane color="green" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 3" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <!-- Target 4 -->
+  <a-entity xrextras-named-image-target="name: vb-target-04" class="image-target" target-handler slam-tracking model-spawn>
+    <a-plane color="yellow" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 4" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <!-- Target 5 -->
+  <a-entity xrextras-named-image-target="name: vb-target-05" class="image-target" target-handler slam-tracking model-spawn>
+    <a-plane color="purple" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 5" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <!-- Target 6 -->
+  <a-entity xrextras-named-image-target="name: vb-target-06" class="image-target" target-handler slam-tracking model-spawn>
+    <a-plane color="orange" width="1" height="1" position="0 0 0" visible="false">
+      <a-text value="Target 6" color="white" align="center" width="2" position="0 0 0.01"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <a-entity
+    light="
+      type: directional;
+      intensity: 0.6;
+      castShadow: false;
+      shadowMapHeight:2048;
+      shadowMapWidth:2048;
+      shadowCameraTop: 10;
+      target: #model;"
+    xrextras-attach="target: model; offset: 1 15 3;"
+    shadow>
+  </a-entity>
+
+  <a-light type="ambient" intensity="0.8" color="#ffffff"></a-light>
+
+  <!-- Sound effects -->
+  <a-entity id="success-sound-player" sound="src: #success-sound; positional: false; volume: 1;"></a-entity>
+  <a-entity id="swoosh-sound-player" sound="src: #swoosh-sound; positional: false; volume: 1;"></a-entity>
+  <a-entity id="swoosh2-sound-player" sound="src: #swoosh2-sound; positional: false; volume: 1;"></a-entity>
+
+  <a-plane
+    id="ground" 
+    rotation="-90 0 0" 
+    width="1000" 
+    height="1000" 
+    material="shader: shadow" 
+    shadow>
+  </a-plane>
+</a-scene>
+
+<!-- End screen -->
+<div id="endscreen" class="hidden">
+  <div class="end-content">
+    <div class="end-header">
+      <h1>Visit the real star of the show</h1>
+      <img src="assets/images/title-gb.svg" alt="GREAT BRITAIN" class="title-heading">
+    </div>
+    
+    <div class="end-main">
+      <h3>DIRECTED BY</h3>
+      <h4 id="end-username">USER NAME</h4>
+      <h3>STARRING</h3>
+      <h4>GREAT BRITAIN</h4>
+      
+      <div class="video-container">
+        <video id="end-video" playsinline controls>
+          <source src="assets/movies/vid-final.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p>Show this screen at the main bar to redeem your sweet surprise.</p>
+    </div>
+    
+  </div>
+</div>

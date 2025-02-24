@@ -1,0 +1,490 @@
+@font-face {
+  font-family: 'EuclidFlex';
+  src: url('./assets/fonts/euclidflex-reg.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Geakosa';
+  src: url('./assets/fonts/geakosa-reg.woff') format('woff');
+}
+
+.hidden {
+  display: none !important;
+}
+
+.already-found-text {
+  position: fixed;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  color: white;
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 28px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  z-index: 1000;
+  letter-spacing: 0.5px;
+}
+
+#endscreen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  display: flex !important;
+}
+
+#endscreen .end-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#endscreen .end-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#endscreen h1 {
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+#endscreen .title-heading {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+
+#endscreen .end-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+#endscreen h3 {
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 0.9rem;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+#endscreen h4 {
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 1.75rem;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+#endscreen .video-container {
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  position: relative;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  overflow: hidden;
+  background: black;
+}
+
+#end-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#endscreen p {
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  margin: 0;
+  text-align: center;
+  max-width: 100%;
+}
+
+#endscreen .end-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  padding-bottom: 1rem;
+}
+
+#endscreen .logo-container {
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+#endscreen .logo-container img {
+  width: 120px;
+  height: auto;
+}
+
+#endscreen .end-footer p {
+  margin: 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  font-size: 16px;
+}
+
+.icon-bar {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0 10px;
+  z-index: 1000;
+  pointer-events: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  65% {
+    transform: scale(0.8);
+  }
+  80% {
+    transform: scale(1.2);
+  }
+  90% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-bar .icon {
+  width: 15vw;
+  max-width: 60px;
+  height: auto;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  opacity: 0.2;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  filter: brightness(0) invert(1);
+  transform: scale(1);
+}
+
+.icon-bar .icon.collected {
+  opacity: 1;
+  filter: none;
+  animation: scaleUp 1s cubic-bezier(0.445, 0.05, 0.55, 0.95) forwards;
+}
+
+.icon-bar .icon.previously-found {
+  opacity: 1;
+  filter: none;
+}
+
+.play-button, .collect-button {
+  position: fixed;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #b50000;
+  color: white;
+  padding: 12px 40px;
+  border-radius: 12px;
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+  min-width: 200px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.play-button.visible, .collect-button.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#splashimage, #endscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: -webkit-fill-available;
+  z-index: 99998;
+  background-color: #b50000;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.splash-content {
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: calc(14px + 0.5vw);
+}
+
+.splash-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.splash-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 10px;
+  padding-bottom: 140px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.splash-content {
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 5px;
+  padding-bottom: 180px;
+  box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: calc(14px + 0.5vw);
+  position: relative;
+}
+
+#start.next-button {
+  position: absolute;
+  bottom: 145px;
+  right: 30px;
+  z-index: 2;
+  background-color: transparent !important;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'EuclidFlex', sans-serif;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: auto;
+  min-width: 0;
+  max-width: 120px;
+  height: 36px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#start.next-button[disabled] {
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.splash-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #04043F;
+  height: 140px;
+  z-index: 99999;
+}
+
+.footer-logo {
+  position: absolute;
+  right: 0;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 60vw;
+  height: auto;
+}
+
+
+
+.splash-title {
+  font-size: 22px;
+  font-family: 'EuclidFlex', sans-serif;
+  text-align: center;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.splash-heading {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+  margin-bottom: 20px;
+}
+
+.instructions {
+  font-family: 'EuclidFlex', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.instructions h2 {
+  font-size: 22px;
+  margin: 0;
+  text-align: left;
+  font-family: 'EuclidFlex', sans-serif;
+}
+
+.instructions ol {
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Camera Screen Styles */
+.camera-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  height: 100%;
+}
+
+.camera-text {
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 28px;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0;
+  color: white;
+  width: 100%;
+}
+
+.camera-button {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 300px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.camera-button:active {
+  transform: scale(0.98);
+}
+
+.camera-icon {
+  width: 72px;
+  height: 72px;
+  filter: brightness(0);
+}
+
+.instructions li {
+  font-size: 16px;
+  line-height: 1.2;
+  padding-left: 0;
+  margin: 0;
+  margin-bottom: 10px;
+  padding-right: 5px;
+}
+
+#nameInput {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: white;
+  color: #b50000;
+  font-family: 'EuclidFlex', sans-serif;
+  font-size: 16px;
+  margin: 0;
+  outline: none;
+  border-radius: 4px;
+}
+
+#nameInput::placeholder {
+  color: rgba(255, 171, 171, 0.733);
+  font-style: italic;
+}
+
+
+
+.logo-container {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #b50000;
+}
+
+.logo-container img {
+  width: 120px;
+  height: auto;
+  touch-action: manipulation;
+}
+
+h2 {
+  font-size: 1.3em;
+  text-align: center;
+  font-family: monospace;
+}

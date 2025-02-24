@@ -1,0 +1,13 @@
+---
+description: Rules for building an 8th Wall AR web app
+globs: 
+---
+
+# Your rule content
+- Always generate comments for new code.
+- The fewer lines of code, the better.
+- Always behave like a senior developer.
+- Always check the code for errors before declaring your task is complete.
+- Do not add extra code that the user hasn't asked for.
+- Online documentation for the 8th Wall API can be found here: https://www.8thwall.com/docs/home/intro/
+- The 8th Wall discussion forums can be found hjere: https://forum.8thwall.com/
