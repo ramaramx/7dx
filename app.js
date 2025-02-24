@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const scene = document.querySelector("a-scene");
-  scene.setAttribute("xrweb", "disableWorldTracking: true"); // Enable SLAM
+  scene.setAttribute("xrweb", "disableWorldTracking: false"); // Enable SLAM
 
   // Play button handler
   playButton.addEventListener("click", () => {
@@ -1127,7 +1127,7 @@ AFRAME.registerComponent("splash-image", {
     // Handle camera button click - Start AR
     cameraButton.onclick = () => {
       // Initialize AR with world tracking disabled
-      this.el.sceneEl.setAttribute("xrweb", "disableWorldTracking: true");
+      this.el.sceneEl.setAttribute("xrweb", "disableWorldTracking: false");
 
       // Hide splash screen
       splashimage.classList.add("hidden");
