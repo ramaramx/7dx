@@ -14,9 +14,11 @@
 
 .already-found-text {
   position: fixed;
+  width: 100vw;
   left: 50%;
-  bottom: 120px;
-  transform: translateX(-50%);
+  text-align: center;
+  bottom: 150px;
+  transform: translate(-50%, 50%);
   color: white;
   font-family: 'EuclidFlex', sans-serif;
   font-size: 28px;
