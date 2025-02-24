@@ -422,46 +422,71 @@ const updateIconOpacity = (targetName, isPreviouslyFound = false) => {
 };
 
 // Configure targets component
+// AFRAME.registerComponent("config-targets", {
+//   schema: {
+//     targets: { type: "string", default: "" },
+//   },
+//   init() {
+//     console.log("Initializing config-targets component");
+//     this.configured = false;
+//     this.configOk = false;
+
+//     this.el.sceneEl.addEventListener("realityready", () => {
+//       console.log("Reality ready event received");
+//       this.configOk = true;
+//       this.ensureImageTargetsConfigured();
+//     });
+//   },
+//   ensureImageTargetsConfigured() {
+//     console.log("Checking image target configuration");
+//     if (this.configured || !this.configOk) {
+//       console.log("Skipping configuration - already configured or not ready");
+//       return;
+//     }
+//     const targets = this.data.targets.split(",").map((t) => t.trim());
+//     console.log("Configuring image targets:", targets);
+//     XR8.XrController.configure({ imageTargets: targets });
+//     this.configured = true;
+//     console.log("Image targets configured successfully");
+//   },
+//   update(oldData) {
+//     console.log("Config-targets update called");
+//     console.log("Old targets:", oldData.targets);
+//     console.log("New targets:", this.data.targets);
+//     this.configured = false;
+//     this.ensureImageTargetsConfigured();
+//   },
+// });
+
 AFRAME.registerComponent("config-targets", {
   schema: {
-    targets: { type: "string", default: "" },
-  },
-  init() {
-    console.log("Initializing config-targets component");
-    this.configured = false;
-    this.configOk = false;
-
-    this.el.sceneEl.addEventListener("realityready", () => {
-      console.log("Reality ready event received");
-      this.configOk = true;
-      this.ensureImageTargetsConfigured();
-    });
+    targets: {type: 'array', default: ['']},
   },
   ensureImageTargetsConfigured() {
-    console.log("Checking image target configuration");
     if (this.configured || !this.configOk) {
-      console.log("Skipping configuration - already configured or not ready");
-      return;
+      return
     }
-    const targets = this.data.targets.split(",").map((t) => t.trim());
-    console.log("Configuring image targets:", targets);
-    XR8.XrController.configure({ imageTargets: targets });
-    this.configured = true;
-    console.log("Image targets configured successfully");
+    // console.log(`Scanning for targets: ${JSON.stringify(this.data.targets)}`)
+    XR8.XrController.configure({imageTargets: this.data.targets})
+    this.configured = true
   },
-  update(oldData) {
-    console.log("Config-targets update called");
-    console.log("Old targets:", oldData.targets);
-    console.log("New targets:", this.data.targets);
-    this.configured = false;
-    this.ensureImageTargetsConfigured();
+  init() {
+    this.configured = false
+    this.configOk = false
+    this.el.sceneEl.addEventListener('realityready', () => {
+      this.configOk = true
+      this.ensureImageTargetsConfigured()
+    })
   },
-});
-
+  update() {
+    this.configured = false
+    this.ensureImageTargetsConfigured()
+  },
+})
 // Panic mode component to handle target rotation
 AFRAME.registerComponent("panic-mode", {
   init() {
-    console.log("Initializing panic-mode component");
+    // console.log("Initializing panic-mode component");
     const targets = [
       "vb-target-01",
       "vb-target-02",
