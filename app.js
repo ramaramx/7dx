@@ -56,8 +56,8 @@ const showCollectButton = () => {
       // Move forward animation
       activeItemModel.setAttribute("animation__position", {
         property: "position",
-        from: "0 0 0.4",
-        to: "0 0 1.5",
+        from: "0 0 0",
+        to: "0 0 0.6",
         dur: 1500,
         easing: "easeOutQuad",
       });
@@ -66,7 +66,7 @@ const showCollectButton = () => {
       activeItemModel.setAttribute("animation__scale", {
         property: "scale",
         from: "0 0 0",
-        to: "1 1 1",
+        to: "0.8 0.8 0.8",
         dur: 1500,
         easing: "easeOutElastic",
       });
@@ -594,7 +594,7 @@ AFRAME.registerComponent("target-handler", {
     backgroundPlane.setAttribute("width", "2.04"); // Match video width
     backgroundPlane.setAttribute("height", "1.1475"); // Match video height
     backgroundPlane.setAttribute("color", "#000000");
-    backgroundPlane.setAttribute("position", "0 0 -0.01"); // Slightly behind video
+    backgroundPlane.setAttribute("position", "0 0 -0.02"); // Slightly behind video
     backgroundPlane.setAttribute("scale", "1 1 1");
 
     // Add background as child of video screen
@@ -608,7 +608,7 @@ AFRAME.registerComponent("target-handler", {
     videoScreen.setAttribute("animation__position", {
       property: "position",
       from: "0 0 -0.1",
-      to: "0 0 0.6", // Move forward to final position
+      to: "0 0 0.3", // Move forward to final position
       dur: animationDuration,
       easing: "easeOutSine",
       startEvents: "animatein",
@@ -704,10 +704,14 @@ AFRAME.registerComponent("target-handler", {
 
     // Create 3D object
     const itemModel = document.createElement("a-entity");
+    itemModel.setAttribute('id', 'itemId')
+    itemModel.setAttribute('class', 'item');
     itemModel.setAttribute("position", "0 0 0.4"); // Start at star's position
     itemModel.setAttribute("scale", "0 0 0"); // Start invisible
     itemModel.setAttribute("rotation", "0 0 0");
     itemModel.setAttribute("visible", "false");
+    itemModel.setAttribute('shadow', '')
+    itemModel.setAttribute('cube-env-map', 'path: ./assets/cubemap/; extension: png; reflectivity: 1;');
 
     // Add animation for video screen
     videoScreen.setAttribute("animation", {
@@ -873,13 +877,13 @@ AFRAME.registerComponent("target-handler", {
             this.itemModel.setAttribute("visible", "true");
             this.itemModel.removeAttribute("animation__position");
             this.itemModel.removeAttribute("animation__scale");
-            this.itemModel.setAttribute("position", "0 0 0.4");
+            this.itemModel.setAttribute("position", "0 0 0.1");
             this.itemModel.setAttribute("scale", "0 0 0");
 
             // Move forward animation
             this.itemModel.setAttribute("animation__position", {
               property: "position",
-              from: "0 0 0.4",
+              from: "0 0 0.1",
               to: "0 0 2.5", // Move further out
               dur: 1500,
               easing: "easeOutQuad",
@@ -891,7 +895,7 @@ AFRAME.registerComponent("target-handler", {
               from: "0 0 0",
               to: "1 1 1",
               dur: 1500,
-              easing: "easeOutElastic",
+              easing: "linear",
             });
           }
 
@@ -925,7 +929,7 @@ AFRAME.registerComponent("target-handler", {
           // Move forward animation
           this.itemModel.setAttribute("animation__position", {
             property: "position",
-            from: "0 0 0.4",
+            from: "0 0 0.1",
             to: "0 0 1.5",
             dur: 1500,
             easing: "easeOutQuad",
