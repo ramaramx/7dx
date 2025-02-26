@@ -235,58 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Collect button handler
-  collectButton.addEventListener("click", () => {
-    if (activeItemModel && collectButtonVisible) {
-      // Hide collect button
-      hideCollectButton();
-
-      // Play success sound
-      const successSound = document.querySelector("#success-sound-player");
-      if (successSound && successSound.components.sound) {
-        successSound.components.sound.playSound();
-      }
-
-      // Animate item collection
-      if (activeItemModel) {
-        // Reset any existing animations
-        activeItemModel.removeAttribute("animation__scale");
-
-        // Scale down animation
-        activeItemModel.setAttribute("animation__scale", {
-          property: "scale",
-          from: "1 1 1",
-          to: "0 0 0",
-          dur: 800, // Slightly faster
-          easing: "easeInQuad",
-        });
-
-        // Hide after animation completes
-        activeItemModel.addEventListener(
-          "animationcomplete__scale",
-          () => {
-            activeItemModel.setAttribute("visible", "false");
-            // Reset scale for next time
-            activeItemModel.setAttribute("scale", "0 0 0");
-            // Clean up animation
-            activeItemModel.removeAttribute("animation__scale");
-          },
-          { once: true }
-        );
-      }
-
-      // Mark target as found and update icon
-      if (!foundTargets[activeItemModel.targetName]) {
-        // First time finding this target
-        console.log(
-          "Target handler: First time finding target:",
-          activeItemModel.targetName
-        );
-        foundTargets[activeItemModel.targetName] = true;
-        saveFoundTargets();
-        updateIconOpacity(activeItemModel.targetName);
-      }
-    }
-  });
 });
 
 // Track currently active marker and video
@@ -420,43 +368,6 @@ const updateIconOpacity = (targetName, isPreviouslyFound = false) => {
   }
 };
 
-// Configure targets component
-// AFRAME.registerComponent("config-targets", {
-//   schema: {
-//     targets: { type: "string", default: "" },
-//   },
-//   init() {
-//     console.log("Initializing config-targets component");
-//     this.configured = false;
-//     this.configOk = false;
-
-//     this.el.sceneEl.addEventListener("realityready", () => {
-//       console.log("Reality ready event received");
-//       this.configOk = true;
-//       this.ensureImageTargetsConfigured();
-//     });
-//   },
-//   ensureImageTargetsConfigured() {
-//     console.log("Checking image target configuration");
-//     if (this.configured || !this.configOk) {
-//       console.log("Skipping configuration - already configured or not ready");
-//       return;
-//     }
-//     const targets = this.data.targets.split(",").map((t) => t.trim());
-//     console.log("Configuring image targets:", targets);
-//     XR8.XrController.configure({ imageTargets: targets });
-//     this.configured = true;
-//     console.log("Image targets configured successfully");
-//   },
-//   update(oldData) {
-//     console.log("Config-targets update called");
-//     console.log("Old targets:", oldData.targets);
-//     console.log("New targets:", this.data.targets);
-//     this.configured = false;
-//     this.ensureImageTargetsConfigured();
-//   },
-// });
-
 AFRAME.registerComponent("config-targets", {
   schema: {
     targets: { type: "array", default: [""] },
@@ -482,7 +393,7 @@ AFRAME.registerComponent("config-targets", {
     this.ensureImageTargetsConfigured();
   },
 });
-// Panic mode component to handle target rotation
+
 AFRAME.registerComponent("panic-mode", {
   init() {
     const targets = [
@@ -493,21 +404,25 @@ AFRAME.registerComponent("panic-mode", {
       "vb-target-05",
       "vb-target-06",
     ];
-    const found = [];
-    const maxActiveTargets = 5; // 8th Wall membatasi hanya 5 target aktif
+    const found = []; // Daftar target yang sudah ditemukan
+    const maxActiveTargets = 5; // Batas target aktif
 
-    let i = 0;
     let lastActiveTargets = [];
 
+    // Inisialisasi state awal
+    const initializeActiveTargets = () => {
+      const initialActiveTargets = targets.slice(0, maxActiveTargets);
+      found.push(...initialActiveTargets);
+      lastActiveTargets = [...initialActiveTargets];
+      const targetString = "targets: " + initialActiveTargets.join(", ");
+      console.log("Setting initial active targets:", targetString);
+      this.el.setAttribute("config-targets", targetString);
+    };
+
+    // Fungsi untuk memperbarui daftar target aktif
     const updateImageTargets = () => {
-      // Dapatkan target yang belum ditemukan
-      const notFound = targets.filter((target) => !found.includes(target));
-
-      // Ambil sejumlah target yang belum ditemukan (dibatasi maxActiveTargets)
-      const notFoundSlice = notFound.slice(i, i + maxActiveTargets);
-
-      // Gabungkan target yang sudah ditemukan dengan yang baru dipilih
-      const active = [...found, ...notFoundSlice].slice(0, maxActiveTargets);
+      // Ambil 5 target terbaru dari daftar found
+      const active = found.slice(-maxActiveTargets);
 
       // Cek apakah daftar aktif berubah sebelum memperbarui atribut
       if (JSON.stringify(active) !== JSON.stringify(lastActiveTargets)) {
@@ -516,48 +431,92 @@ AFRAME.registerComponent("panic-mode", {
         this.el.setAttribute("config-targets", targetString);
         lastActiveTargets = active; // Simpan daftar terbaru
       }
-
-      // Update indeks untuk rotasi target
-      i = i + maxActiveTargets >= notFound.length ? 0 : i + maxActiveTargets;
     };
 
-    // Event: Saat target ditemukan
-    this.el.sceneEl.addEventListener("xrimagefound", ({ detail }) => {
-      if (!found.includes(detail.name)) {
-        found.push(detail.name);
-        updateImageTargets(); // Perbarui daftar target segera
+    // Inisialisasi state awal saat komponen pertama kali dimuat
+    initializeActiveTargets();
+
+    // Event: Saat tombol koleksi ditekan
+    collectButton.addEventListener("click", () => {
+      if (activeItemModel && collectButtonVisible) {
+        const collectedTarget = activeItemModel.targetName;
+
+        // Hapus target yang dikoleksi dari daftar found
+        const indexToRemove = found.indexOf(collectedTarget);
+        if (indexToRemove !== -1) {
+          found.splice(indexToRemove, 1);
+          console.log(`Removed collected target: ${collectedTarget}`);
+        }
+
+        // Tambahkan vb-target-06 ke daftar found jika belum ada
+        if (!found.includes("vb-target-06")) {
+          found.push("vb-target-06");
+          console.log("Added vb-target-06 to found targets");
+        }
+
+        // Perbarui daftar target aktif
+        updateImageTargets();
+
+        // Sembunyikan tombol koleksi
+        hideCollectButton();
+
+        // Putar suara sukses
+        const successSound = document.querySelector("#success-sound-player");
+        if (successSound && successSound.components.sound) {
+          successSound.components.sound.playSound();
+        }
+
+        // Animasi pengumpulan item
+        if (activeItemModel) {
+          // Hapus animasi yang ada
+          activeItemModel.removeAttribute("animation__scale");
+
+          // Animasi scale down
+          activeItemModel.setAttribute("animation__scale", {
+            property: "scale",
+            from: "1 1 1",
+            to: "0 0 0",
+            dur: 800, // Lebih cepat
+            easing: "easeInQuad",
+          });
+
+          // Sembunyikan setelah animasi selesai
+          activeItemModel.addEventListener(
+            "animationcomplete__scale",
+            () => {
+              activeItemModel.setAttribute("visible", "false");
+              // Reset scale untuk penggunaan berikutnya
+              activeItemModel.setAttribute("scale", "0 0 0");
+              // Bersihkan animasi
+              activeItemModel.removeAttribute("animation__scale");
+
+              // Tandai target sebagai sudah ditemukan dan perbarui ikon
+              if (!foundTargets[collectedTarget]) {
+                console.log(
+                  "Target handler: First time finding target:",
+                  collectedTarget
+                );
+                foundTargets[collectedTarget] = true;
+                saveFoundTargets();
+                updateIconOpacity(collectedTarget);
+              }
+            },
+            { once: true }
+          );
+        }
       }
     });
-
-    // Event: Saat target hilang
-    this.el.sceneEl.addEventListener("xrimagelost", ({ detail }) => {
-      if (activeVideo && !activeVideo.paused) {
-        console.log("Ignoring target lost during video playback");
-        return;
-      }
-
-      const index = found.indexOf(detail.name);
-      if (index !== -1) {
-        found.splice(index, 1);
-        updateImageTargets(); // Perbarui daftar target segera
-      }
-
-      // Sembunyikan tombol play jika target hilang
-      hidePlayButton();
-    });
-
-    // Jalankan rotasi target secara berkala
-    console.log("Starting target rotation interval");
-    setInterval(updateImageTargets, 1500);
   },
 });
+
+// Event listener untuk tombol collectButton
 
 // Component to handle target found behavior
 AFRAME.registerComponent("target-handler", {
   init() {
-    console.log("Initializing target-handler component");
+    // console.log("Initializing target-handler component");
     this.targetName = this.el.getAttribute("xrextras-named-image-target").name;
-    console.log("Target name:", this.targetName);
+    // console.log("Target name:", this.targetName);
 
     this.plane = this.el.querySelector("a-plane");
     this.text = this.plane.querySelector("a-text");
@@ -785,15 +744,15 @@ AFRAME.registerComponent("target-handler", {
 
     // Log when the model is loaded and modify materials
     star.addEventListener("model-loaded", (event) => {
-      console.log("Star model loaded successfully for target", targetNum);
+      // console.log("Star model loaded successfully for target", targetNum);
       const mesh = event.detail.model;
       mesh.traverse((node) => {
         // Log each node's name to inspect the structure
-        console.log("Node name:", node.name);
+        // console.log("Node name:", node.name);
 
         if (node.isMesh && node.material) {
           if (node.material.name === "background") {
-            console.log("Found background material:", node.material);
+            // console.log("Found background material:", node.material);
             // Get the corresponding texture for this target
             const texture = document.querySelector(`#starTexture${targetNum}`);
             const tex = new THREE.Texture(texture);
@@ -805,7 +764,7 @@ AFRAME.registerComponent("target-handler", {
             node.material.color.setHex(0xffffff);
             node.material.needsUpdate = true;
           } else if (node.name === "HIDER") {
-            console.log("Found HIDER object:", node);
+            // console.log("Found HIDER object:", node);
             // Apply xrextras-hider-material
             const el = node.el || node.parent.el;
             if (el) {
@@ -818,7 +777,7 @@ AFRAME.registerComponent("target-handler", {
 
     // Log any loading errors
     star.addEventListener("model-error", (error) => {
-      console.error("Error loading star model:", error);
+      // console.error("Error loading star model:", error);
     });
 
     // Listen on the scene element for events
@@ -846,7 +805,7 @@ AFRAME.registerComponent("target-handler", {
     // Only handle target found events before video starts
     sceneEl.addEventListener("xrimagefound", (evt) => {
       if (evt.detail.name === this.targetName) {
-        console.log("Target handler: Image found:", this.targetName);
+        // console.log("Target handler: Image found:", this.targetName);
 
         // Jangan lakukan apa-apa jika video sedang diputar
         if (activeVideo && !activeVideo.paused) return;
@@ -868,9 +827,9 @@ AFRAME.registerComponent("target-handler", {
           collectButton.classList.contains("visible");
 
         if (isItemVisible || isCollectButtonVisible) {
-          console.log(
-            "Item model sudah muncul atau tombol koleksi aktif, menghapus star."
-          );
+          // console.log(
+          //   "Item model sudah muncul atau tombol koleksi aktif, menghapus star."
+          // );
 
           if (this.star) {
             this.star.setAttribute("visible", "false");
@@ -908,7 +867,6 @@ AFRAME.registerComponent("target-handler", {
             this.star.setAttribute("visible", "false");
             this.star.removeAttribute("gltf-model", "");
           }
-
         } else if (!activeVideo && !collectButtonVisible) {
           if (this.star) {
             this.star.setAttribute("visible", "true");
@@ -924,7 +882,7 @@ AFRAME.registerComponent("target-handler", {
         }
 
         if (!foundTargets[this.targetName]) {
-          console.log("Menampilkan animasi bintang untuk target baru");
+          // console.log("Menampilkan animasi bintang untuk target baru");
 
           if (this.star) {
             this.star.setAttribute("visible", "true");
@@ -948,7 +906,7 @@ AFRAME.registerComponent("target-handler", {
               "#swoosh2-sound-player"
             );
             if (swoosh2Sound && swoosh2Sound.components.sound) {
-              console.log("Memainkan suara swoosh2");
+              // console.log("Memainkan suara swoosh2");
               swoosh2Sound.components.sound.playSound();
             }
           }
@@ -979,7 +937,7 @@ AFRAME.registerComponent("target-handler", {
             this.videoScreen.setAttribute("visible", "true");
 
             const handleVideoEnd = () => {
-              console.log("Video selesai, berpindah ke mode koleksi");
+              // console.log("Video selesai, berpindah ke mode koleksi");
 
               this.videoScreen.setAttribute("animation__scaleaway", {
                 property: "scale",
@@ -1037,7 +995,7 @@ AFRAME.registerComponent("splash-image", {
     const checkName = () => {
       const name = nameInput.value.trim();
       const hasName = !!name;
-      console.log("Name check:", { value: name, hasName });
+      // console.log("Name check:", { value: name, hasName });
       start.disabled = !hasName;
 
       // Update stored name whenever it changes
@@ -1054,7 +1012,7 @@ AFRAME.registerComponent("splash-image", {
 
     // Handle keyboard enter key
     nameInput.addEventListener("keyup", (e) => {
-      console.log("Keyup event:", e.key);
+      // console.log("Keyup event:", e.key);
       if (e.key === "Enter" || e.key === "Done" || e.key === "Go") {
         nameInput.blur(); // Hide keyboard
         if (!nameInput.value.trim()) return;

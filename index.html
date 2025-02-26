@@ -17,6 +17,7 @@
    <!-- <script src="slam-tracking.js"></script> -->
 </head> 
 <body>
+  
   <button id="play-button" class="play-button">Tap to play</button>
   <button id="collect-button" class="play-button">Tap to collect</button>
   <div id="icon-bar" class="icon-bar">
@@ -35,6 +36,7 @@
       <h1 class="splash-title">Visit the real star of the show</h1>
       <img src="assets/images/title-gb.svg" alt="GREAT BRITAIN" class="splash-heading">
     </div>
+    <button id="testBtn"  style="position: absolute; z-index: 99999; top: 0!important;">test</button>
     
     <!-- Main Content Section -->
     <div class="splash-main">
@@ -52,6 +54,7 @@
           <li>Collect all 6 scenes and you will receive a Great Britain movie trailer and a sweet surprise. Show this at the main bar to redeem your prize.</li>
           <li>In order to enjoy your experience to the fullest, please turn your sound on.</li>
         </ol>
+        
       </div>
 
       <!-- Camera Button Screen -->
@@ -74,8 +77,8 @@
 <a-scene
   splash-image
   xrextras-gesture-detector
-  -landing-page
-  -xrextras-loading
+  landing-page
+  xrextras-loading
   panic-mode
   config-targets="targets: vb-target-01, vb-target-02, vb-target-03, vb-target-04, vb-target-05, vb-target-06"
   xrweb
