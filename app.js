@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
           activeMarker.star.setAttribute("visible", "true");
           activeMarker.star.setAttribute("animation__scaleout", {
             property: "scale",
-            from: "1.6 1.6 1.6",
+            from: "1.4 1.4 1.4",
             to: "0 0 0",
             dur: 800,
             easing: "easeInQuad",
@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (activeMarker && activeMarker.star) {
             activeMarker.star.setAttribute("animation__scaleout", {
               property: "scale",
-              from: "1.6 1.6 1.6",
+              from: "1.4 1.4 1.4",
               to: "0 0 0",
               dur: 800,
               easing: "easeInQuad",
@@ -239,7 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeItemModel && collectButtonVisible) {
       // Hide collect button
       hideCollectButton();
-      
 
       // Play success sound
       const successSound = document.querySelector("#success-sound-player");
@@ -460,33 +459,32 @@ const updateIconOpacity = (targetName, isPreviouslyFound = false) => {
 
 AFRAME.registerComponent("config-targets", {
   schema: {
-    targets: {type: 'array', default: ['']},
+    targets: { type: "array", default: [""] },
   },
   ensureImageTargetsConfigured() {
     if (this.configured || !this.configOk) {
-      return
+      return;
     }
     // console.log(`Scanning for targets: ${JSON.stringify(this.data.targets)}`)
-    XR8.XrController.configure({imageTargets: this.data.targets})
-    this.configured = true
+    XR8.XrController.configure({ imageTargets: this.data.targets });
+    this.configured = true;
   },
   init() {
-    this.configured = false
-    this.configOk = false
-    this.el.sceneEl.addEventListener('realityready', () => {
-      this.configOk = true
-      this.ensureImageTargetsConfigured()
-    })
+    this.configured = false;
+    this.configOk = false;
+    this.el.sceneEl.addEventListener("realityready", () => {
+      this.configOk = true;
+      this.ensureImageTargetsConfigured();
+    });
   },
   update() {
-    this.configured = false
-    this.ensureImageTargetsConfigured()
+    this.configured = false;
+    this.ensureImageTargetsConfigured();
   },
-})
+});
 // Panic mode component to handle target rotation
 AFRAME.registerComponent("panic-mode", {
   init() {
-    // console.log("Initializing panic-mode component");
     const targets = [
       "vb-target-01",
       "vb-target-02",
@@ -496,38 +494,43 @@ AFRAME.registerComponent("panic-mode", {
       "vb-target-06",
     ];
     const found = [];
-    const maxActiveTargets = 5; // 8th Wall has a limit on concurrent active targets
+    const maxActiveTargets = 5; // 8th Wall membatasi hanya 5 target aktif
 
     let i = 0;
+    let lastActiveTargets = [];
+
     const updateImageTargets = () => {
-      // Get targets that haven't been found yet
+      // Dapatkan target yang belum ditemukan
       const notFound = targets.filter((target) => !found.includes(target));
 
-      // Take a slice of not-found targets
+      // Ambil sejumlah target yang belum ditemukan (dibatasi maxActiveTargets)
       const notFoundSlice = notFound.slice(i, i + maxActiveTargets);
 
-      // Combine found targets with current slice of not-found targets
+      // Gabungkan target yang sudah ditemukan dengan yang baru dipilih
       const active = [...found, ...notFoundSlice].slice(0, maxActiveTargets);
 
-      // Update the active targets
-      const targetString = "targets: " + active.join(", ");
-      console.log("Setting active targets:", targetString);
-      this.el.setAttribute("config-targets", targetString);
+      // Cek apakah daftar aktif berubah sebelum memperbarui atribut
+      if (JSON.stringify(active) !== JSON.stringify(lastActiveTargets)) {
+        const targetString = "targets: " + active.join(", ");
+        console.log("Setting active targets:", targetString);
+        this.el.setAttribute("config-targets", targetString);
+        lastActiveTargets = active; // Simpan daftar terbaru
+      }
 
-      // Move to next slice, wrapping around if needed
+      // Update indeks untuk rotasi target
       i = i + maxActiveTargets >= notFound.length ? 0 : i + maxActiveTargets;
     };
 
-    // Track found/lost targets
+    // Event: Saat target ditemukan
     this.el.sceneEl.addEventListener("xrimagefound", ({ detail }) => {
       if (!found.includes(detail.name)) {
         found.push(detail.name);
+        updateImageTargets(); // Perbarui daftar target segera
       }
     });
 
+    // Event: Saat target hilang
     this.el.sceneEl.addEventListener("xrimagelost", ({ detail }) => {
-
-      // Don't handle target lost during video playback
       if (activeVideo && !activeVideo.paused) {
         console.log("Ignoring target lost during video playback");
         return;
@@ -536,14 +539,16 @@ AFRAME.registerComponent("panic-mode", {
       const index = found.indexOf(detail.name);
       if (index !== -1) {
         found.splice(index, 1);
-        // Hide play button when target is lost
-        hidePlayButton();
+        updateImageTargets(); // Perbarui daftar target segera
       }
+
+      // Sembunyikan tombol play jika target hilang
+      hidePlayButton();
     });
 
-    // Update active targets every second
+    // Jalankan rotasi target secara berkala
     console.log("Starting target rotation interval");
-    setInterval(updateImageTargets, 1000);
+    setInterval(updateImageTargets, 1500);
   },
 });
 
@@ -559,6 +564,8 @@ AFRAME.registerComponent("target-handler", {
 
     // Create the star model
     const star = document.createElement("a-entity");
+    const number = parseInt(this.targetName.split("-")[2]);
+    star.setAttribute("class", `starModel${number}`);
     star.setAttribute("gltf-model", "#starModel");
     star.setAttribute("scale", "1 1 1");
     star.setAttribute("position", "0 0 0");
@@ -594,7 +601,7 @@ AFRAME.registerComponent("target-handler", {
     backgroundPlane.setAttribute("width", "2.04"); // Match video width
     backgroundPlane.setAttribute("height", "1.1475"); // Match video height
     backgroundPlane.setAttribute("color", "#000000");
-    backgroundPlane.setAttribute("position", "0 0 -0.02"); // Slightly behind video
+    backgroundPlane.setAttribute("position", "0 0 -0.05"); // Slightly behind video
     backgroundPlane.setAttribute("scale", "1 1 1");
 
     // Add background as child of video screen
@@ -608,7 +615,7 @@ AFRAME.registerComponent("target-handler", {
     videoScreen.setAttribute("animation__position", {
       property: "position",
       from: "0 0 -0.1",
-      to: "0 0 0.3", // Move forward to final position
+      to: "0 0 0.6", // Move forward to final position
       dur: animationDuration,
       easing: "easeOutSine",
       startEvents: "animatein",
@@ -704,14 +711,17 @@ AFRAME.registerComponent("target-handler", {
 
     // Create 3D object
     const itemModel = document.createElement("a-entity");
-    itemModel.setAttribute('id', 'itemId')
-    itemModel.setAttribute('class', 'item');
-    itemModel.setAttribute("position", "0 0 0.4"); // Start at star's position
+    itemModel.setAttribute("id", "itemId");
+    itemModel.setAttribute("class", "item");
+    itemModel.setAttribute("position", "0 0 0.3"); // Start at star's position
     itemModel.setAttribute("scale", "0 0 0"); // Start invisible
     itemModel.setAttribute("rotation", "0 0 0");
     itemModel.setAttribute("visible", "false");
-    itemModel.setAttribute('shadow', '')
-    itemModel.setAttribute('cube-env-map', 'path: ./assets/cubemap/; extension: png; reflectivity: 1;');
+    itemModel.setAttribute("shadow", "");
+    itemModel.setAttribute(
+      "cube-env-map",
+      "path: ./assets/cubemap/; extension: png; reflectivity: 1;"
+    );
 
     // Add animation for video screen
     videoScreen.setAttribute("animation", {
@@ -729,7 +739,7 @@ AFRAME.registerComponent("target-handler", {
       if (this.star) {
         this.star.setAttribute("animation__scaleout", {
           property: "scale",
-          from: "1.6 1.6 1.6",
+          from: "1.4 1.4 1.4",
           to: "0 0 0",
           dur: 800,
           easing: "easeInQuad",
@@ -838,74 +848,68 @@ AFRAME.registerComponent("target-handler", {
       if (evt.detail.name === this.targetName) {
         console.log("Target handler: Image found:", this.targetName);
 
-        // Don't do anything if video is playing
+        // Jangan lakukan apa-apa jika video sedang diputar
         if (activeVideo && !activeVideo.paused) return;
 
-        // Set active marker and show initial state
         activeMarker = this;
-        this.star.setAttribute("visible", "true");
-        this.star.setAttribute("position", "0 0 0");
-        this.star.setAttribute("scale", "1 1 1");
 
-        // Show play button if video is ready
+        // Ambil nomor target dari targetName
+        const number = parseInt(this.targetName.split("-")[2]);
+
+        // Jika star ada, berikan class unik berdasarkan nomor target
+        if (this.star) {
+          this.star.setAttribute("class", `starModel${number}`);
+        }
+
+        // Cek apakah itemModel sudah muncul sebelumnya
+        const isItemVisible =
+          this.itemModel && this.itemModel.getAttribute("visible") === "true";
+        const isCollectButtonVisible =
+          collectButton.classList.contains("visible");
+
+        if (isItemVisible || isCollectButtonVisible) {
+          console.log(
+            "Item model sudah muncul atau tombol koleksi aktif, menghapus star."
+          );
+
+          if (this.star) {
+            this.star.setAttribute("visible", "false");
+            this.star.removeAttribute("gltf-model", "");
+          }
+        } else {
+          // Jika itemModel belum muncul dan collectButton belum aktif, tampilkan star
+          if (this.star) {
+            this.star.setAttribute("visible", "true");
+            this.star.setAttribute("scale", "1 1 1");
+          }
+        }
+
         if (this.videoScreen && !activeVideo) {
           showPlayButton();
         }
 
-        // Check if we're in the collect sequence
         if (activeItemModel && collectButtonVisible) {
-          // Show 3D model and collect button
           if (this.itemModel) {
             this.itemModel.setAttribute("visible", "true");
           }
           collectButton.classList.add("visible");
-          return; // Don't do anything else during collect sequence
+          return;
         }
 
-        // Check if target was previously found
         if (foundTargets[this.targetName]) {
-          // Show Already Found text
+          this.itemModel.setAttribute("visible", "false");
+          hidePlayButton();
+
           if (this.foundTextDiv) {
             this.foundTextDiv.style.opacity = "1";
           }
 
-          
-
-          // Show and animate 3D model
-          if (this.itemModel) {
-            // Reset initial state and make visible
-            this.itemModel.setAttribute("visible", "true");
-            this.itemModel.removeAttribute("animation__position");
-            this.itemModel.removeAttribute("animation__scale");
-            this.itemModel.setAttribute("position", "0 0 0.1");
-            this.itemModel.setAttribute("scale", "0 0 0");
-
-            // Move forward animation
-            this.itemModel.setAttribute("animation__position", {
-              property: "position",
-              from: "0 0 0.1",
-              to: "0 0 2.5", // Move further out
-              dur: 1500,
-              easing: "easeOutQuad",
-            });
-
-            // Scale up animation
-            this.itemModel.setAttribute("animation__scale", {
-              property: "scale",
-              from: "0 0 0",
-              to: "1 1 1",
-              dur: 1500,
-              easing: "linear",
-            });
-          }
-
-          // Hide star for found targets
           if (this.star) {
             this.star.setAttribute("visible", "false");
+            this.star.removeAttribute("gltf-model", "");
           }
-        } else if (!activeVideo && !collectButtonVisible) {
 
-          // Only show star if we haven't started the sequence
+        } else if (!activeVideo && !collectButtonVisible) {
           if (this.star) {
             this.star.setAttribute("visible", "true");
             this.star.setAttribute("scale", "1 1 1");
@@ -913,100 +917,55 @@ AFRAME.registerComponent("target-handler", {
           showPlayButton();
         }
 
-        // Remove the plane and text
         if (this.plane) {
           this.plane.parentNode.removeChild(this.plane);
           this.plane = null;
           this.text = null;
         }
 
-        // Check if target was previously found
-        if (foundTargets[this.targetName]) {
-          console.log("Target previously found, showing 3D item directly");
-          this.itemModel.setAttribute("visible", "false");
-          hidePlayButton();
+        if (!foundTargets[this.targetName]) {
+          console.log("Menampilkan animasi bintang untuk target baru");
 
-          // Move forward animation
-          this.itemModel.setAttribute("animation__position", {
-            property: "position",
-            from: "0 0 0.1",
-            to: "0 0 1.5",
-            dur: 1500,
-            easing: "easeOutQuad",
-          });
+          if (this.star) {
+            this.star.setAttribute("visible", "true");
+            this.star.setAttribute("scale", "0 0 0");
 
-          // Scale up animation
-          this.itemModel.setAttribute("animation__scale", {
-            property: "scale",
-            from: "0 0 0",
-            to: "0.8 0.8 0.8",
-            dur: 1500,
-            easing: "easeOutElastic",
-          });
+            this.star.removeAttribute("animation__scale");
+            this.star.removeAttribute("animation__scaleout");
 
-          // Continuous rotation animation
-          this.itemModel.setAttribute("animation__rotate", {
-            property: "rotation",
-            from: "0 0 0",
-            to: "0 360 0",
-            dur: 5000,
-            loop: true,
-            easing: "linear",
-          });
+            this.star.setAttribute("animation__scale", {
+              property: "scale",
+              from: "0 0 0",
+              to: "1.4 1.4 1.4",
+              dur: 9000,
+              easing: "easeOutElastic",
+              startEvents: "animatein",
+            });
 
-          // Show 'Already Found!' text in UI
-          this.foundTextDiv.style.opacity = "1";
+            this.star.emit("animatein");
 
-          // Make sure star is hidden for already found targets
-          this.star.setAttribute("visible", "false");
-          this.star.setAttribute("scale", "0 0 0");
-        } else {
-          console.log("Making star visible");
-
-          // Show and animate star for new targets
-          this.star.setAttribute("visible", "true");
-          this.star.setAttribute("scale", "0 0 0");
-
-          // Remove any existing animations
-          this.star.removeAttribute("animation__scale");
-          this.star.removeAttribute("animation__scaleout");
-
-          // Re-add the scale up animation
-          this.star.setAttribute("animation__scale", {
-            property: "scale",
-            from: "0 0 0",
-            to: "1.6 1.6 1.6",
-            dur: 9000,
-            easing: "easeOutElastic",
-            startEvents: "animatein",
-          });
-
-          // Trigger the animation
-          this.star.emit("animatein");
-
-          // Play star animation sound
-          const swoosh2Sound = document.querySelector("#swoosh2-sound-player");
-          if (swoosh2Sound && swoosh2Sound.components.sound) {
-            console.log("Playing swoosh2 sound");
-            swoosh2Sound.components.sound.playSound();
+            const swoosh2Sound = document.querySelector(
+              "#swoosh2-sound-player"
+            );
+            if (swoosh2Sound && swoosh2Sound.components.sound) {
+              console.log("Memainkan suara swoosh2");
+              swoosh2Sound.components.sound.playSound();
+            }
           }
 
-          // Show play button after star animation
           setTimeout(() => {
-            // Stop ALL videos before starting a new one
             ALL_TARGETS.forEach((target) => {
               const num = parseInt(target.split("-")[2]);
               const v = document.querySelector(`#video${num}`);
               if (v) {
                 v.pause();
                 v.currentTime = 0;
-                v.muted = true; // Reset muted state
+                v.muted = true;
               }
             });
 
             const video = document.querySelector(`#video${targetNum}`);
 
-            // Reset video state
             video.pause();
             video.currentTime = 0;
             video.muted = true;
@@ -1014,18 +973,14 @@ AFRAME.registerComponent("target-handler", {
             activeVideo = video;
             activeVideoScreen = this.videoScreen;
 
-            // Show play button
             showPlayButton();
 
-            // Set up video screen
             this.videoScreen.setAttribute("src", `#video${targetNum}`);
-            this.videoScreen.setAttribute("visible", "true"); // Keep visible
+            this.videoScreen.setAttribute("visible", "true");
 
-            // Add video end listener
             const handleVideoEnd = () => {
-              console.log("Video ended, transitioning to collect state");
+              console.log("Video selesai, berpindah ke mode koleksi");
 
-              // Scale away video
               this.videoScreen.setAttribute("animation__scaleaway", {
                 property: "scale",
                 from: "1 1 1",
@@ -1034,28 +989,21 @@ AFRAME.registerComponent("target-handler", {
                 easing: "linear",
               });
 
-              // After video scales away, show collect button
               setTimeout(() => {
-                // Clear video playback state
                 activeVideo = null;
                 activeVideoScreen = null;
 
-                // Re-enable target tracking
                 targetTrackingEnabled = true;
 
-                // Store reference to item model and target info for collect button
                 activeItemModel = this.itemModel;
                 activeItemModel.targetName = this.targetName;
 
-                // Show collect button
                 showCollectButton();
               }, 900);
 
-              // Remove the listener
               video.removeEventListener("ended", handleVideoEnd);
             };
 
-            // Add the video end listener
             video.addEventListener("ended", handleVideoEnd);
           }, 800);
 

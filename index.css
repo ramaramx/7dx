@@ -351,8 +351,6 @@ html, body {
   height: auto;
 }
 
-
-
 .splash-title {
   font-size: 22px;
   font-family: 'EuclidFlex', sans-serif;
@@ -367,18 +365,18 @@ html, body {
   height: auto;
   display: block;
   margin: 10px auto;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .instructions {
   font-family: 'EuclidFlex', sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .instructions h2 {
-  font-size: 22px;
+  font-size: 20px;
   margin: 0;
   text-align: left;
   font-family: 'EuclidFlex', sans-serif;
@@ -390,7 +388,7 @@ html, body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
 }
 
 /* Camera Screen Styles */
@@ -398,9 +396,12 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 40px;
+  justify-content: flex-start;
+  gap: 20px;
   height: 100%;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 20px;
 }
 
 .camera-text {
@@ -411,6 +412,7 @@ html, body {
   margin: 0;
   color: white;
   width: 100%;
+  padding-bottom: 30px;
 }
 
 .camera-button {
@@ -458,15 +460,13 @@ html, body {
   font-size: 16px;
   margin: 0;
   outline: none;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 #nameInput::placeholder {
   color: rgba(255, 171, 171, 0.733);
   font-style: italic;
 }
-
-
 
 .logo-container {
   width: 100%;
@@ -489,4 +489,12 @@ h2 {
   font-size: 1.3em;
   text-align: center;
   font-family: monospace;
+}
+
+.sound-instruction {
+  position: relative;
+  z-index: 10;
+  color: white;
+  text-align: center;
+  margin-bottom: 10px;
 }
