@@ -574,7 +574,7 @@ AFRAME.registerComponent("target-handler", {
     videoScreen.setAttribute("animation__position", {
       property: "position",
       from: "0 0 -0.1",
-      to: "0 0 0.6", // Move forward to final position
+      to: "0 0 0.9", // Move forward to final position
       dur: animationDuration,
       easing: "easeOutSine",
       startEvents: "animatein",
